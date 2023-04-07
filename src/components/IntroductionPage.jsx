@@ -65,6 +65,45 @@ export default function IntroductionPage() {
   };
 
 
+
+
+  const [loading, setLoading] = useState(false);
+  let [obj, setObj] = useState({ choices: [] });
+  const [payload, setPayLoad] = useState({
+    prompt: "Como va la vida?",
+
+    temperature: 0.5,
+    n: 1,
+    model: "text-davinci-003"
+  });
+
+  const getRes = (event) => {
+    
+    event.preventDefault();
+    setLoading(true);
+    fetch('https://api.openai.com/v1/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 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'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => {
+      console.log(error);
+      setLoading(false);
+    });
+  };
+
+  const responseHandler = (res) => {
+    if (res.status === 200) {
+      setObj(res.data);
+      setLoading(false);
+    }
+  };
+
   {
     /* <img src="/dog.png" className={styles.icon} />
         <h3>Name my pet</h3>
@@ -191,6 +230,22 @@ export default function IntroductionPage() {
                 <img src={NextIcon} alt="heru" />
               </Button>
             </button>
+
+            <div className="col-6 text_wrap">
+            <p>
+              {loading ? (
+                <span>loading...</span>
+              ) : (
+                obj?.choices?.map((v, i) => <div>{v.text}</div>)
+              )}
+            </p>
+          </div>
+        <div style={{ padding: "0 13px" }}>
+          <button disabled={loading} onClick={getRes}>
+            {loading ? "Loading... " : "Get resposne"}
+          </button>
+        </div>
+        
           </>
         )}
       </form>
