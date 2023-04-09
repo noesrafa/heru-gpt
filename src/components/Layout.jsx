@@ -22,5 +22,5 @@ const Wrapper = styled.div`
   gap: 32px;
   justify-content: center;
   align-items: center;
-  padding-top: 60px;
+  padding-top: 32px;
 `;

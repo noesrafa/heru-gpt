@@ -14,7 +14,7 @@ const Container = styled.div`
   background-color: var(--blue-100);
   position: relative;
   border-radius: 10px;
-  margin: 32px auto;
+  margin: 32px auto 12px auto;
 `;
 
 const Progress = styled.div`

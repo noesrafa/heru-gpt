@@ -13,18 +13,18 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import styled from "styled-components";
+import GeneratePrompt from "../utils/prompts";
 
 export default function IntroductionPage() {
   let navigate = useNavigate();
 
   const [step, setStep] = useState(0);
-
+  const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     name: "",
     work: "",
     incomes: "",
   });
-
   const [result, setResult] = useState();
 
   const handleInputChange = (event) => {
@@ -34,105 +34,56 @@ export default function IntroductionPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(formValues.name, formValues.work, formValues.incomes);
 
-    try {
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ animal: formValues.name }),
-        });
-  
-        const data = await response.json();
-        if (response.status !== 200) {
-          throw (
-            data.error ||
-            new Error(`Request failed with status ${response.status}`)
-          );
-        }
-  
-        setResult(data.result);
-        setAnimalInput("");
-      } catch (error) {
-        // Consider implementing your own error handling logic here
-        console.error(error);
-        alert(error.message);
-      }
-
-      console.log(result)
-  };
-
-
-
-
-  const [loading, setLoading] = useState(false);
-  let [obj, setObj] = useState({ choices: [] });
-  const [payload, setPayLoad] = useState({
-    prompt: "Como va la vida?",
-
-    temperature: 0.5,
-    n: 1,
-    model: "text-davinci-003"
-  });
-
-  const getRes = (event) => {
-    
-    event.preventDefault();
+    setResult("");
     setLoading(true);
-    fetch('https://api.openai.com/v1/completions', {
-      method: 'POST',
+
+    fetch("https://api.openai.com/v1/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer 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'
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer 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",
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        prompt: GeneratePrompt(formValues.name, formValues.work, formValues.incomes),
+        temperature: 0.2,
+        n: 1,
+        model: "text-davinci-003",
+        max_tokens: 1500,
+      }),
     })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => {
-      console.log(error);
-      setLoading(false);
-    });
+      .then((response) => response.json())
+      .then((data) => dataHandler(data))
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
   };
 
-  const responseHandler = (res) => {
-    if (res.status === 200) {
-      setObj(res.data);
+  function dataHandler(data) {
+    if (data.choices.length > 0) {
+      setResult(data);
       setLoading(false);
+      setStep(4);
     }
-  };
-
-  {
-    /* <img src="/dog.png" className={styles.icon} />
-        <h3>Name my pet</h3>
-        <form onSubmit={onSubmit}>
-          <input
-            type="text"
-            name="animal"
-            placeholder="Enter an animal"
-            value={animalInput}
-            onChange={(e) => setAnimalInput(e.target.value)}
-          />
-          <input type="submit" value="Generate names" />
-        </form>
-        <div className={styles.result}>{result}</div>  */
   }
 
   return (
     <Layout>
-      <ProgressBar
-        progress={
-          (step === 0 && 15) ||
-          (step === 1 && 30) ||
-          (step === 2 && 60) ||
-          (step === 3 && 90)
-        }
-      />
+      {step !== 4 && (
+        <ProgressBar
+          progress={
+            (step === 0 && 15) ||
+            (step === 1 && 30) ||
+            (step === 2 && 60) ||
+            (step === 3 && 90)
+          }
+        />
+      )}
       {step === 0 && (
         <>
-          <img src={FolderIcon} alt="heru" style={{ marginTop: "12px" }} />
+          <img src={FolderIcon} alt="heru" />
           <Title>Sobre tus impuestos</Title>
           <Subtitle secondary>
             Heru utiliza la información que le proporcionas para sugerirte un
@@ -172,7 +123,8 @@ export default function IntroductionPage() {
               onChange={handleInputChange}
               type="text"
               name="name"
-              placeholder="Escribe tu nombre"
+              placeholder="Escribe tu nombre y apellidos"
+              onKeyDown={(event) => event.key === "Enter" && setStep(2)}
             />
             <ButtonBack>
               <img src={BackIcon} alt="heru" onClick={() => setStep(0)} />
@@ -197,6 +149,7 @@ export default function IntroductionPage() {
               type="text"
               name="work"
               placeholder="Trabajo como..."
+              onKeyDown={(event) => event.key === "Enter" && setStep(3)}
             />
             <ButtonBack>
               <img src={BackIcon} alt="heru" onClick={() => setStep(1)} />
@@ -206,6 +159,7 @@ export default function IntroductionPage() {
             </Button>
           </>
         )}
+
         {step === 3 && (
           <>
             <QuestionTitle>¿Cuales son tus ingresos aproximados?</QuestionTitle>
@@ -222,33 +176,54 @@ export default function IntroductionPage() {
               name="incomes"
               placeholder="Gano ..."
             />
+
             <ButtonBack>
               <img src={BackIcon} alt="heru" onClick={() => setStep(2)} />
             </ButtonBack>
             <button type="submit">
               <Button>
-                <img src={NextIcon} alt="heru" />
+                {loading ? (
+                  <>
+                    <div class="jelly-triangle">
+  <div class="jelly-triangle__dot" ></div>
+  <div class="jelly-triangle__traveler" ></div>
+</div>
+
+<svg width="0" height="0" class="jelly-maker">
+  <defs>
+    <filter id="uib-jelly-triangle-ooze">
+      <feGaussianBlur
+        in="SourceGraphic"
+        stdDeviation="7.3"
+        result="blur"
+      />
+      <feColorMatrix
+        in="blur"
+        mode="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
+        result="ooze"
+      />
+      <feBlend in="SourceGraphic" in2="ooze" />
+    </filter>
+  </defs>
+</svg>
+                  </>
+                ) : (
+                  <img src={NextIcon} alt="heru" />
+                )}
               </Button>
             </button>
-
-            <div className="col-6 text_wrap">
-            <p>
-              {loading ? (
-                <span>loading...</span>
-              ) : (
-                obj?.choices?.map((v, i) => <div>{v.text}</div>)
-              )}
-            </p>
-          </div>
-        <div style={{ padding: "0 13px" }}>
-          <button disabled={loading} onClick={getRes}>
-            {loading ? "Loading... " : "Get resposne"}
-          </button>
-        </div>
-        
           </>
         )}
       </form>
+      {step === 4 && (
+        <>
+          <ExampleText>{result && result?.choices[0]?.text}</ExampleText>
+          <ButtonBack>
+            <img src={BackIcon} alt="heru" onClick={() => setStep(3)} />
+          </ButtonBack>
+        </>
+      )}
     </Layout>
   );
 }

@@ -10,11 +10,11 @@ export default function HomePage() {
 
   return (
     <Layout color={"var(--blue-100)"}>
-      <img src={HeruLogo} alt="heru" style={{ margin: "22px 0" }} />
-      <img src={ManIcon} alt="heru" />
+      <img src={HeruLogo} alt="heru" style={{ margin: "20px 0 12px 0" }} />
+      <img src={ManIcon} alt="heru" style={{width: "200px"}}/>
       <Title style={{marginTop: "12px"}}>Heru me ayuda a presentar mis impuestos muy fácil</Title>
       <Subtitle>
-        En 5 minutos con conocimientos minímos de impuestos y del SAT.
+        En 5 minutos con conocimientos mínimos de impuestos y del SAT.
       </Subtitle>
       <StyledButton onClick={() => navigate("/introduction")}>
         Empezar

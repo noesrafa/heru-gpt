@@ -41,13 +41,19 @@ const StyledButton = styled.div`
   padding: 13px 0;
   cursor: pointer;
   transition: 200ms;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
   &:hover {
     transform: translateY(-2px);
+  }
+  &:active {
+    transform: translateY(2px);
   }
 `;
 
 const SecondaryStyledButton = styled.div`
-    margin-top: 12px;
+  margin-top: 12px;
   background-color: var(--blue-100);
   color: var(--blue-300);
   font-size: 15px;
@@ -58,8 +64,14 @@ const SecondaryStyledButton = styled.div`
   padding: 13px 0;
   cursor: pointer;
   transition: 200ms;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
   &:hover {
     transform: translateY(-2px);
+  }
+  &:active {
+    transform: translateY(2px);
   }
 `;
 
