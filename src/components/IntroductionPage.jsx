@@ -1,4 +1,4 @@
-import ProgressBar from "./progressBar";
+import ProgressBar from "./ProgressBar";
 import FolderIcon from "../assets/folder.svg";
 import NextIcon from "../assets/next-arrow.svg";
 import BackIcon from "../assets/back-arrow.svg";
